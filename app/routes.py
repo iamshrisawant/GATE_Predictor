@@ -159,7 +159,7 @@ def calculate():
             print(f"[ERROR] Calculation failed: {report['error']}")
             return jsonify(report), 500
             
-        print("[DEBUG] Calculation success.")
+        print(f"[DEBUG] Calculation success. Score: {report['summary']['total_score']}")
         return jsonify(report)
     except Exception as e:
         import traceback

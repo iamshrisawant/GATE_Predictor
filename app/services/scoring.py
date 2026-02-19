@@ -35,16 +35,22 @@ def calculate_score(html_path, schema_data_or_path):
     # Read HTML content
     if html_path.startswith("http"):
         try:
-             r = requests.get(html_path)
+             headers = {
+                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+             }
+             print(f"[DEBUG] Fetching URL: {html_path}")
+             r = requests.get(html_path, headers=headers)
              r.raise_for_status()
              soup = BeautifulSoup(r.text, "html.parser")
         except Exception as e:
+             print(f"[ERROR] Failed to fetch URL: {e}")
              return {"error": str(e)}
     else:
         with open(html_path, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f, "html.parser")
 
     questions = soup.find_all("table", class_="questionPnlTbl")
+    print(f"[DEBUG] Found {len(questions)} question tables.")
     
     total_score = 0
     attempted = 0
