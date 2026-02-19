@@ -87,7 +87,7 @@ def upload_paper():
         
         # 2. Extract Key from Memory Stream
         key_stream = io.BytesIO(key_bytes)
-        schema = extraction.extract_answer_key(key_stream, config_path=None, paper_code=code)
+        schema = extraction.extract_answer_key(key_stream, paper_code=code)
         
         # 3. Save Schema
         schema_path = f"{base_dir}/schema.json"
