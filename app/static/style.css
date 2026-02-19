@@ -400,8 +400,8 @@ select:focus {
 /* Specific Admin Inputs Rectification */
 #yearInput,
 #codeInput {
-    max-width: 220px;
-    /* Constrain width to look proportionate */
+    width: 100%;
+    /* Fill container */
     text-align: center;
     /* Center text for code/year */
     font-weight: 600;

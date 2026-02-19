@@ -102,7 +102,7 @@
             const storedPin = sessionStorage.getItem('GATE_ADMIN_PIN');
 
             // If Admin Flow detected (Strict check)
-            if (isAdminParam && storedPin === 'GATE2025') {
+            if (isAdminParam && storedPin) {
                 IS_ADMIN_MODE = true;
 
                 // Visual Indicator
