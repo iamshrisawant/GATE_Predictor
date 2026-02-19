@@ -145,15 +145,25 @@ def calculate():
         return jsonify({"error": "Paper not found on server."}), 404
         
     try:
+        print(f"[DEBUG] Reading schema from: {schema_path}")
         schema = storage.read_json(schema_path)
         if not schema:
+             print("[ERROR] Schema not found or empty.")
              return jsonify({"error": "Failed to read schema."}), 500
-            
+        
+        print(f"[DEBUG] Schema keys count: {len(schema)}")
+        print(f"[DEBUG] Calculating score for URL: {url}")
+        
         report = scoring.calculate_score(url, schema)
         if "error" in report:
+            print(f"[ERROR] Calculation failed: {report['error']}")
             return jsonify(report), 500
+            
+        print("[DEBUG] Calculation success.")
         return jsonify(report)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @main_bp.route('/api/check_paper_exists', methods=['GET'])
