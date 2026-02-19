@@ -102,8 +102,10 @@ class StorageService:
             try:
                 # storage list returns dicts
                 res = self.client.storage.from_(self.bucket).list(directory)
+                # print(f"[DEBUG] list({directory}) -> {res}")
                 return [x['name'] for x in res]
-            except:
+            except Exception as e:
+                print(f"[Storage Error] List failed for {directory}: {e}")
                 return []
     
     def move(self, src, dst):
@@ -116,9 +118,28 @@ class StorageService:
             os.makedirs(os.path.dirname(full_dst), exist_ok=True)
             shutil.move(full_src, full_dst)
         else:
-            # Supabase Move
+            # Supabase Move (Recursive for directories)
             try:
-                self.client.storage.from_(self.bucket).move(src, dst)
+                print(f"[DEBUG] Attempting move {src} -> {dst}")
+                items = self.list(src)
+                print(f"[DEBUG] Items in {src}: {items}")
+                
+                if not items:
+                    # Maybe it's a single file? Try direct move
+                    print(f"[DEBUG] No items found in {src}, trying direct move...")
+                    self.client.storage.from_(self.bucket).move(src, dst)
+                    return
+                
+                # It's a directory, move children
+                for item in items:
+                    old_path = f"{src}/{item}"
+                    new_path = f"{dst}/{item}"
+                    try:
+                        print(f"[DEBUG] Moving item: {old_path} -> {new_path}")
+                        self.client.storage.from_(self.bucket).move(old_path, new_path)
+                    except Exception as ex:
+                        print(f"[Storage Error] Failed to move {old_path}: {ex}")
+
             except Exception as e:
                 print(f"[Storage Error] Move failed: {e}")
 
@@ -130,11 +151,17 @@ class StorageService:
             elif os.path.exists(full_path):
                 os.remove(full_path)
         else:
-            # Supabase Delete
-            # If path implies directory, list and delete all
-            # Storage delete takes list of paths
+            # Supabase Delete (Recursive)
             try:
-                self.client.storage.from_(self.bucket).remove([path])
+                # 1. Try list (for folder)
+                items = self.list(path)
+                if items:
+                    # Delete all files in folder
+                    files_to_remove = [f"{path}/{x}" for x in items]
+                    self.client.storage.from_(self.bucket).remove(files_to_remove)
+                else:
+                    # 2. Try single file
+                    self.client.storage.from_(self.bucket).remove([path])
             except Exception as e:
                 print(f"[Storage Error] Delete failed: {e}")
 
