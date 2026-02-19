@@ -31,6 +31,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    line-height: 1.6;
+    /* Improved readability */
     /* Subtle warm lighting */
     background-image:
         radial-gradient(at 0% 0%, rgba(68, 64, 60, 0.15) 0px, transparent 50%),
@@ -55,16 +57,18 @@ header {
 }
 
 header h1 {
-    font-size: 2rem;
-    /* Reduced from 3rem */
-    font-weight: 600;
+    font-size: 2.25rem;
+    /* Slightly larger */
+    font-weight: 700;
     margin: 0;
-    background: linear-gradient(to right, #fafaf9, #a8a29e);
+    background: linear-gradient(to right, #fafaf9, #d6d3d1);
+    /* Brighter gradient */
     /* Subtle gradient text */
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
+    /* Tighter heading tracking */
 }
 
 header p {
@@ -74,26 +78,36 @@ header p {
 }
 
 /* Compact Card Styling */
+/* Compact Card Styling */
 .card {
     background: var(--card-bg);
     backdrop-filter: blur(16px);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    /* Reduced padding */
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-    /* Subtler shadow */
+    border-radius: 16px;
+    /* Moderner roundness */
+    padding: 2.5rem;
+    /* More breath */
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+    /* Softer, deeper shadow */
     animation: slideUp 0.6s ease-out;
 }
 
 /* Compact Form Elements */
 .input-group {
     display: flex;
-    gap: 0.75rem;
-    /* Tighter gap */
+    gap: 1rem;
+    /* Standardizing gap */
     margin-bottom: 0;
-    /* Remove bottom margin if last child */
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.input-group input {
+    flex: 1;
+    /* Allow input to grow */
+    min-width: 200px;
+    /* Prevent crushing on mobile */
 }
 
 /* Warm Input Styling */
@@ -101,23 +115,21 @@ input[type="text"],
 select {
     width: 100%;
     background: rgba(12, 10, 9, 0.6);
-    /* Darker inner background */
     border: 1px solid var(--border);
-    padding: 0.75rem 1rem;
-    /* Reduced padding */
-    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    /* Larger, tactile touch targets */
+    border-radius: 10px;
+    /* Modern curve */
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1rem;
     outline: none;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     appearance: none;
     font-family: inherit;
-    /* Custom simple arrow */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    /* Adjust arrow position */
-    background-size: 1rem;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
 }
 
 input[type="text"] {
@@ -127,32 +139,30 @@ input[type="text"] {
 input[type="text"]:focus,
 select:focus {
     border-color: var(--text-secondary);
-    /* Grey focus is more standard/monochrome */
-    background-color: rgba(28, 25, 23, 0.8);
-    box-shadow: 0 0 0 1px var(--text-secondary);
+    background-color: rgba(28, 25, 23, 0.9);
+    box-shadow: 0 0 0 4px rgba(231, 229, 228, 0.05);
+    /* Subtle focus ring */
 }
 
 button {
     background: var(--text-primary);
-    /* White/Off-white button */
     color: var(--bg-color);
-    /* Dark text on button */
     border: none;
-    padding: 0.75rem 1.5rem;
-    /* Reduced padding */
-    border-radius: 6px;
+    padding: 1rem 2rem;
+    /* Matches input height */
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
-    /* Prevent button text wrap */
+    font-size: 1rem;
+    letter-spacing: -0.01em;
 }
 
 button:hover {
-    background: #e7e5e4;
-    /* Slightly dimmer white */
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(255, 255, 255, 0.15);
 }
 
 /* Grid Adjustments */
@@ -163,6 +173,34 @@ button:hover {
     gap: 1rem;
     margin-bottom: 1.5rem !important;
     /* Override inline styles */
+}
+
+.compact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns strictly */
+    gap: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 0.5rem;
+}
+
+.compact-grid>div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure inputs fill their grid cell */
+.compact-grid input {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+    .compact-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+    }
 }
 
 /* Stats Grid - Cleaner Look */
@@ -206,28 +244,40 @@ button:hover {
 }
 
 /* Table Compactness */
+/* Table Compactness */
 table {
     width: 100%;
     border-collapse: separate;
+    /* Required for border-radius */
     border-spacing: 0;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+    overflow: hidden;
+    border-radius: 8px;
+    /* Rounded corners for table */
+    border: 1px solid var(--border);
 }
 
 th,
 td {
-    padding: 0.75rem;
-    /* Reduced cell padding */
+    padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 th {
+    background: rgba(255, 255, 255, 0.03);
+    /* Subtle header bg */
     color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-size: 0.8rem;
+}
+
+tr:last-child td {
+    border-bottom: none;
+    /* Remove last border */
 }
 
 tr:hover td {
@@ -397,19 +447,7 @@ select:focus {
     box-shadow: 0 0 0 2px rgba(231, 229, 228, 0.1);
 }
 
-/* Specific Admin Inputs Rectification */
-#yearInput,
-#codeInput {
-    width: 100%;
-    /* Fill container */
-    text-align: center;
-    /* Center text for code/year */
-    font-weight: 600;
-    /* Bold text for importance */
-    letter-spacing: 0.05em;
-    background: rgba(0, 0, 0, 0.2);
-    /* Slightly simpler bg */
-}
+/* Removed specific overrides to ensure consistency */
 
 select option {
     background-color: #1c1917;
