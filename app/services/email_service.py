@@ -62,8 +62,23 @@ def send_approval_email(year, code, attachments=None):
                 except Exception as ex:
                     print(f"[EMAIL ERROR] Failed to attach {item.get('name')}: {ex}")
         
-        print(f"[EMAIL DEBUG] Connecting to SMTP Server: {SMTP_SERVER}:{SMTP_PORT}...", flush=True)
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+        # Force IPv4 Resolution to avoid "Network is unreachable" on cloud envs
+        target_host = SMTP_SERVER
+        import socket
+        try:
+            # Get first IPv4 address
+            addr_info = socket.getaddrinfo(SMTP_SERVER, SMTP_PORT, socket.AF_INET)
+            target_host = addr_info[0][4][0]
+            print(f"[EMAIL DEBUG] Resolved {SMTP_SERVER} to {target_host} (IPv4)")
+        except Exception as e:
+            print(f"[EMAIL WARNING] IPv4 resolution failed: {e}. Using hostname.")
+
+        print(f"[EMAIL DEBUG] Connecting to SMTP Server: {target_host}:{SMTP_PORT}...", flush=True)
+        with smtplib.SMTP(target_host, SMTP_PORT) as server:
+            # Fix for SSL: server._host must match the certificate domain, not the IP
+            if target_host != SMTP_SERVER:
+                server._host = SMTP_SERVER
+            
             server.starttls()
             print("[EMAIL DEBUG] Logging in...", flush=True)
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
