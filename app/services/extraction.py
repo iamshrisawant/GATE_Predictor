@@ -118,8 +118,7 @@ def detect_metadata(pdf_path):
              if y_full:
                  meta["year"] = y_full.group(1)
     
-    if meta["year"] == "2025" and not meta["year"]: # Double check specific override if needed
-        pass
+
 
     if not meta["paper_code"]:
         codes = "AE|AG|AR|BM|BT|CE|CH|CS|CY|DA|EC|EE|ES|EY|GE|GG|IN|MA|ME|MN|MT|NM|PE|PH|PI|ST|TF|XE|XH|XL"

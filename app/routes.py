@@ -9,7 +9,7 @@ main_bp = Blueprint('main', __name__)
 DATA_FOLDER = os.path.join(os.getcwd(), 'data')
 LIVE_FOLDER = os.path.join(DATA_FOLDER, 'live')
 STAGING_FOLDER = os.path.join(DATA_FOLDER, 'staging')
-ADMIN_PIN = os.getenv("ADMIN_PIN", "GATE2025")
+ADMIN_PIN = os.getenv("ADMIN_PIN")
 
 # Ensure dirs exist
 os.makedirs(LIVE_FOLDER, exist_ok=True)
@@ -19,9 +19,7 @@ os.makedirs(STAGING_FOLDER, exist_ok=True)
 def index():
     return render_template('index.html')
 
-@main_bp.route('/admin')
-def admin():
-    return render_template('admin.html')
+
 
 @main_bp.route('/dashboard')
 def dashboard():
@@ -166,11 +164,7 @@ def staging_file():
 
 @main_bp.route('/api/approve_token/<token>', methods=['GET'])
 def approve_token(token):
-    # This might require serializer access? email_service has it.
-    # But serializer in email_service is local. 
-    # We should expose it or move serializer to init?
-    # Actually email_service.serializer is global in that module.
-    # We can import it.
+
     try:
         data = email_service.serializer.loads(token, salt="approve-paper", max_age=86400)
         year = data['year']
