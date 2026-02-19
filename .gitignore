@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+venv/
+env/
+
+# Data (Assuming user uploads shouldn't be in repo)
+data/
+uploads/
+temp_*
+*.log
+
+# Windows
+Thumbs.db

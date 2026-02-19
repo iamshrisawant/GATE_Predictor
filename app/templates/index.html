@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE Score Predictor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>GATE Score Predictor</h1>
+            <p>Premium Accuracy. For All Papers.</p>
+        </header>
+
+        <div class="card">
+            <!-- Cascading Dropdowns -->
+            <div class="form-grid">
+                <div>
+                    <label>Year</label>
+                    <select id="yearSelect" onchange="onYearChange()">
+                        <option value="">Select Year</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Paper</label>
+                    <select id="codeSelect" disabled>
+                        <option value="">Select Paper</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Paste your Response Sheet URL here...">
+                <button onclick="calculateScore()">Calculate Score</button>
+            </div>
+        </div>
+
+        <!-- How it Works Section -->
+        <div class="card" style="margin-top: 2rem; max-width: 800px;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">How it Works</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- For Users -->
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;"><i class="fa-solid fa-calculator"></i>
+                        Calculate Score</h4>
+                    <ol style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.6;">
+                        <li>Select <strong>Year</strong> and <strong>Paper Code</strong>.</li>
+                        <li>Login to GATE portal and view your Response Sheet.</li>
+                        <li>Copy the <strong>URL</strong> of your Response Sheet.</li>
+                        <li>Paste the URL above and click <strong>Calculate</strong>.</li>
+                    </ol>
+                </div>
+
+                <!-- For Contributors -->
+                <div>
+                    <h4 style="color: var(--success); margin-bottom: 0.5rem; font-size: 1.1rem;">
+                        <i class="fa-solid fa-hand-holding-heart"></i> Contribute Missing Data
+                    </h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        If your Year or Paper Code is not listed:
+                    </p>
+                    <ol style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.6;">
+                        <li>
+                            <a href="/contribute"
+                                style="color: var(--success); font-weight: bold; text-decoration: none; border-bottom: 1px dotted;">
+                                Go to Contribute Page
+                            </a>
+                        </li>
+                        <li>Upload the <strong>Master Answer Key</strong>.</li>
+                        <li>Upload the matching <strong>Master Question Paper</strong>.</li>
+                        <li>Wait, papers go <strong>Live</strong> upon Admin approval.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Community Section -->
+        <footer
+            style="margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+            <div style="display: flex; justify-content: center; gap: 2rem;">
+                <a href="/contribute" class="footer-link">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Contribute Data for missing papers
+                </a>
+                <a href="https://github.com/iamshrisawant" class="footer-link">
+                    <i class="fa-solid fa-github"></i> GitHub: iamshrisawant
+                </a>
+            </div>
+
+            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.8rem;">
+            </p>
+        </footer>
+
+    </div>
+
+    <style>
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+    </style>
+
+    <!-- Loader -->
+    <div id="loading" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p style="color: var(--text-primary); font-size: 1.1rem;">Analyzing Response Sheet...</p>
+    </div>
+
+    <div id="resultSection" style="display: none;">
+        <div class="card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Total Score</div>
+                    <div class="stat-value" id="totalScore" style="color: var(--accent)">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Correct</div>
+                    <div class="stat-value" id="correctCount" style="color: var(--success)">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Wrong</div>
+                    <div class="stat-value" id="wrongCount" style="color: var(--danger)">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Unattempted</div>
+                    <div class="stat-value" id="attemptedLabel">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Detailed Breakdown</h3>
+            <div style="overflow-x: auto;">
+                <table id="detailsTable">
+                    <thead>
+                        <tr>
+                            <th>Q.No</th>
+                            <th>Type</th>
+                            <th>Your Ans</th>
+                            <th>Key</th>
+                            <th>Result</th>
+                            <th>Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        let papersData = {};
+
+        // Toast Helper
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${msg}</span>`;
+
+            container.appendChild(toast);
+
+            // Auto remove
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        async function loadPapers() {
+            try {
+                const res = await fetch('/api/papers');
+                papersData = await res.json();
+
+                const yearSel = document.getElementById('yearSelect');
+                yearSel.innerHTML = '<option value="">Select Year</option>';
+
+                Object.keys(papersData).sort().reverse().forEach(y => {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.innerText = y;
+                    yearSel.appendChild(opt);
+                });
+            } catch (e) {
+                console.error("Failed to load papers", e);
+                showToast("Failed to load available papers", "error");
+            }
+        }
+
+        function onYearChange() {
+            const year = document.getElementById('yearSelect').value;
+            const codeSel = document.getElementById('codeSelect');
+
+            codeSel.innerHTML = '<option value="">Select Paper</option>';
+
+            if (year && papersData[year]) {
+                codeSel.disabled = false;
+                Object.keys(papersData[year]).sort().forEach(code => { // papersData[year] is now array of strings
+                    // Fix: In app.py list_papers returns { "2025": ["CS", "CS1"] }, so we iterate array
+                    // Actually app.py Step 821 list_papers returns tree[year].append(code) -> so it is a list.
+                });
+
+                // Correction: papersData[year] is an ARRAY of strings e.g. ["CS", "DA"]
+                papersData[year].sort().forEach(code => {
+                    const opt = document.createElement('option');
+                    opt.value = code;
+                    opt.innerText = code;
+                    codeSel.appendChild(opt);
+                });
+            } else {
+                codeSel.disabled = true;
+            }
+        }
+
+        async function calculateScore() {
+            const url = document.getElementById('urlInput').value.trim();
+            const year = document.getElementById('yearSelect').value;
+            const code = document.getElementById('codeSelect').value;
+
+            if (!url) return showToast("Please enter a URL", "error");
+            if (!year || !code) return showToast("Please select Year and Paper", "error");
+
+            document.getElementById('loading').style.display = 'flex'; // Flex for centering
+            document.getElementById('resultSection').style.display = 'none';
+
+            try {
+                const res = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, year, paper_code: code })
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    showToast(data.error, "error");
+                    return;
+                }
+
+                // Update UI
+                document.getElementById('totalScore').innerText = data.summary.total_score.toFixed(2);
+                document.getElementById('correctCount').innerText = data.summary.correct;
+                document.getElementById('wrongCount').innerText = data.summary.wrong;
+                document.getElementById('attemptedLabel').innerText = (data.summary.total_questions - data.summary.attempted);
+
+                const tbody = document.querySelector('#detailsTable tbody');
+                tbody.innerHTML = '';
+
+                data.details.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.Q}</td>
+                        <td>${item.Type}</td>
+                        <td>${item.User || '-'}</td>
+                        <td>${item.Key}</td>
+                        <td class="${item.Result === 'Correct' ? 'result-correct' : (item.Result === 'Wrong' ? 'result-wrong' : '')}">${item.Result}</td>
+                        <td>${item.Marks.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('resultSection').style.display = 'block';
+                showToast("Calculation Complete!", "success");
+
+            } catch (e) {
+                showToast("Failed to calculate score. Check console.", "error");
+                console.error(e);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Init
+        loadPapers();
+    </script>
+</body>
+
+</html>

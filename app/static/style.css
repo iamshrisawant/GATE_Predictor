@@ -1,0 +1,424 @@
+:root {
+    /* Warm Monochromatic Palette (Stone/Sand) */
+    --bg-color: #0c0a09;
+    /* Stone 950 */
+    --card-bg: rgba(28, 25, 23, 0.7);
+    /* Stone 900 with opacity */
+    --text-primary: #fafaf9;
+    /* Stone 50 */
+    --text-secondary: #a8a29e;
+    /* Stone 400 */
+    --accent: #e7e5e4;
+    /* Stone 200 (High contrast accent) */
+    --accent-dim: #44403c;
+    /* Stone 700 */
+    --success: #84cc16;
+    /* Muted Lime - keeps warmth */
+    --danger: #ef4444;
+    /* Standard Red */
+    --border: rgba(231, 229, 228, 0.1);
+    /* Stone 200 low opacity */
+
+    --glass-shine: rgba(255, 255, 255, 0.03);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Subtle warm lighting */
+    background-image:
+        radial-gradient(at 0% 0%, rgba(68, 64, 60, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(87, 83, 78, 0.15) 0px, transparent 50%);
+}
+
+/* Global Layout Adjustments */
+.container {
+    width: 95%;
+    /* Wider on small screens */
+    max-width: 900px;
+    /* Tighter standard width */
+    margin: 2rem auto;
+    padding: 0 1rem;
+    /* Prevent edge touching */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    animation: fadeIn 1s ease-out;
+}
+
+header h1 {
+    font-size: 2rem;
+    /* Reduced from 3rem */
+    font-weight: 600;
+    margin: 0;
+    background: linear-gradient(to right, #fafaf9, #a8a29e);
+    /* Subtle gradient text */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+/* Compact Card Styling */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    /* Reduced padding */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    /* Subtler shadow */
+    animation: slideUp 0.6s ease-out;
+}
+
+/* Compact Form Elements */
+.input-group {
+    display: flex;
+    gap: 0.75rem;
+    /* Tighter gap */
+    margin-bottom: 0;
+    /* Remove bottom margin if last child */
+}
+
+/* Warm Input Styling */
+input[type="text"],
+select {
+    width: 100%;
+    background: rgba(12, 10, 9, 0.6);
+    /* Darker inner background */
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    /* Reduced padding */
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    appearance: none;
+    font-family: inherit;
+    /* Custom simple arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    /* Adjust arrow position */
+    background-size: 1rem;
+}
+
+input[type="text"] {
+    background-image: none;
+}
+
+input[type="text"]:focus,
+select:focus {
+    border-color: var(--text-secondary);
+    /* Grey focus is more standard/monochrome */
+    background-color: rgba(28, 25, 23, 0.8);
+    box-shadow: 0 0 0 1px var(--text-secondary);
+}
+
+button {
+    background: var(--text-primary);
+    /* White/Off-white button */
+    color: var(--bg-color);
+    /* Dark text on button */
+    border: none;
+    padding: 0.75rem 1.5rem;
+    /* Reduced padding */
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    /* Prevent button text wrap */
+}
+
+button:hover {
+    background: #e7e5e4;
+    /* Slightly dimmer white */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+/* Grid Adjustments */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* Responsive columns */
+    gap: 1rem;
+    margin-bottom: 1.5rem !important;
+    /* Override inline styles */
+}
+
+/* Stats Grid - Cleaner Look */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* Force 4 columns on large screens */
+    gap: 1rem;
+    margin-top: 0;
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2x2 on mobile */
+    }
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    /* Smaller, cleaner numbers */
+    font-weight: 600;
+    margin: 0.25rem 0;
+    letter-spacing: -0.02em;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+/* Table Compactness */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 0.5rem;
+}
+
+th,
+td {
+    padding: 0.75rem;
+    /* Reduced cell padding */
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+th {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.result-correct {
+    color: var(--success);
+}
+
+.result-wrong {
+    color: var(--danger);
+}
+
+/* Admin Dropzone Compact */
+.dropzone {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.01);
+    padding: 2rem;
+    /* Reduced from 3rem */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropzone:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--text-secondary);
+}
+
+/* Typography fix for labels */
+label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem !important;
+}
+
+/* Toast Notifications */
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.toast {
+    background: #1c1917;
+    /* Stone 900 */
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--text-primary);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+    min-width: 300px;
+    animation: slideInRight 0.3s ease-out forwards;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.toast.success {
+    border-left-color: var(--success);
+}
+
+.toast.error {
+    border-left-color: var(--danger);
+}
+
+.toast.info {
+    border-left-color: var(--text-secondary);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+/* Loader */
+/* Loader */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(12, 10, 9, 0.9);
+    /* Opaque stone background */
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--text-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Form Control Styling (Inputs & Selects) */
+input[type="text"],
+select {
+    width: 100%;
+    background: rgba(12, 10, 9, 0.4);
+    /* Darker, more premium feel */
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    /* Sleeker padding */
+    border-radius: 6px;
+    /* Tighter radius */
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    /* Standard font size */
+    outline: none;
+    transition: all 0.2s ease;
+    appearance: none;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+input[type="text"]:hover,
+select:hover {
+    background: rgba(12, 10, 9, 0.6);
+    border-color: var(--text-secondary);
+}
+
+input[type="text"]:focus,
+select:focus {
+    border-color: var(--accent);
+    background-color: rgba(12, 10, 9, 0.8);
+    box-shadow: 0 0 0 2px rgba(231, 229, 228, 0.1);
+}
+
+/* Specific Admin Inputs Rectification */
+#yearInput,
+#codeInput {
+    max-width: 220px;
+    /* Constrain width to look proportionate */
+    text-align: center;
+    /* Center text for code/year */
+    font-weight: 600;
+    /* Bold text for importance */
+    letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.2);
+    /* Slightly simpler bg */
+}
+
+select option {
+    background-color: #1c1917;
+    color: var(--text-primary);
+    padding: 1rem;
+}
+
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: rgba(0, 0, 0, 0.2);
+}

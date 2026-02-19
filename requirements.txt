@@ -1,0 +1,7 @@
+flask
+flask-cors
+pdfplumber
+beautifulsoup4
+requests
+itsdangerous
+python-dotenv

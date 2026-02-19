@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribute Data | GATE Predictor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container" style="max-width: 800px;">
+        <header>
+            <h1>Contribute Data</h1>
+            <p>Help us expand the database. Data contributed will be live after admin approval.</p>
+        </header>
+
+        <!-- 1. Upload Section (Now on Top) -->
+        <div class="card">
+            <h3
+                style="margin-top:0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                1. Upload Files</h3>
+
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Answer Key -->
+                <div>
+                    <label style="margin-bottom: 0.8rem; display: block;">Official Answer Key (PDF)</label>
+                    <div class="dropzone" id="dropKey">
+                        <p style="margin: 0; font-weight: 500;">Drag & Drop Answer Key PDF</p>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">or click to
+                            browse</p>
+                        <input type="file" id="fileKey" accept=".pdf" style="display: none;">
+                    </div>
+                    <div id="fileKeyList" class="file-list"></div>
+                </div>
+
+                <!-- Question Paper -->
+                <div>
+                    <label style="margin-bottom: 0.8rem; display: block;">Master Question Paper (PDF)</label>
+                    <div class="dropzone" id="dropQP">
+                        <p style="margin: 0; font-weight: 500;">Drag & Drop Question Paper PDF</p>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">or click to
+                            browse</p>
+                        <input type="file" id="fileQP" accept=".pdf" style="display: none;">
+                    </div>
+                    <div id="fileQPList" class="file-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Paper Details Section (Now in Middle) -->
+        <div class="card">
+            <h3
+                style="margin-top:0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                2. Paper Details</h3>
+            <div class="form-grid">
+                <div>
+                    <label>Year</label>
+                    <input type="text" id="yearInput" placeholder="Enter Year" autocomplete="off">
+                </div>
+                <div>
+                    <label>Paper Code</label>
+                    <input type="text" id="codeInput" placeholder="Enter Paper Code" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="card" style="text-align: right; background: rgba(28, 25, 23, 0.9);">
+            <button id="submitBtn" onclick="processUpload()" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                <i class="fa-solid fa-paper-plane"></i> Submit for Review
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">&larr; Back to
+                Home</a>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loading" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p style="color: var(--text-primary); font-size: 1.1rem;">Processing PDF...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts remains same mostly, just IDs managed -->
+    <script>
+        // Use window scope variables to ensure they persist
+        window.uploadedKeyFile = null;
+        window.uploadedQPFile = null;
+
+        // Admin Session Logic
+        let IS_ADMIN_MODE = false;
+
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const isAdminParam = params.get('admin') === 'true';
+            const storedPin = sessionStorage.getItem('GATE_ADMIN_PIN');
+
+            // If Admin Flow detected (Strict check)
+            if (isAdminParam && storedPin === 'GATE2025') {
+                IS_ADMIN_MODE = true;
+
+                // Visual Indicator
+                const banner = document.createElement('div');
+                banner.className = 'card';
+                banner.style.background = 'rgba(16, 185, 129, 0.1)';
+                banner.style.border = '1px solid #10b981';
+                banner.style.color = '#10b981';
+                banner.style.marginBottom = '1.5rem';
+                banner.style.padding = '1rem';
+                banner.innerHTML = '<strong><i class="fa-solid fa-user-shield"></i> Admin Mode Active:</strong> Direct Live Upload Enabled';
+                const header = document.querySelector('header');
+                if (header && !document.querySelector('.admin-banner')) {
+                    banner.classList.add('admin-banner');
+                    header.after(banner);
+                }
+
+                // Update Button for Admin
+                const btn = document.getElementById('submitBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Publish Live';
+                    btn.style.background = '#10b981'; // Green for Live
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                }
+            }
+        });
+
+        // Removed obsolete toggleAdminMode function
+
+        // Toast Helper
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        // Setup Dropzone
+        function setupDropzone(dropId, inputId, listId, type) {
+            const drop = document.getElementById(dropId);
+            const inp = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+
+            drop.onclick = () => inp.click();
+
+            inp.onchange = (e) => handleFile(e.target.files[0]);
+
+            drop.ondragover = (e) => { e.preventDefault(); drop.style.borderColor = 'var(--text-primary)'; };
+            drop.ondragleave = () => { drop.style.borderColor = 'var(--border)'; };
+            drop.ondrop = (e) => {
+                e.preventDefault();
+                drop.style.borderColor = 'var(--border)';
+                handleFile(e.dataTransfer.files[0]);
+            };
+
+            function handleFile(file) {
+                if (!file) return;
+                if (file.type !== 'application/pdf') return showToast("Only PDF files allowed", "error");
+
+                // Assign to global window variable
+                if (type === 'KEY') window.uploadedKeyFile = file;
+                if (type === 'QP') window.uploadedQPFile = file;
+
+                list.innerHTML = `<div class="file-item">
+                    <span style="color: var(--success);">✓</span> ${file.name}
+                </div>`;
+                showToast(`Selected: ${file.name}`, "success");
+
+                // Auto-detect metadata if it's the Key file
+                if (type === 'KEY') detectMetadata(file);
+            }
+        }
+
+        setupDropzone('dropKey', 'fileKey', 'fileKeyList', 'KEY');
+        setupDropzone('dropQP', 'fileQP', 'fileQPList', 'QP');
+
+        async function detectMetadata(file) {
+            const fd = new FormData();
+            fd.append('file', file);
+
+            document.getElementById('loading').style.display = 'flex';
+            try {
+                const res = await fetch('/api/detect_metadata', { method: 'POST', body: fd });
+                const data = await res.json();
+
+                if (data.paper_code) {
+                    document.getElementById('codeInput').value = data.paper_code;
+                    showToast(`Detected Paper Code: ${data.paper_code}`, "success");
+                } else {
+                    showToast("Could not auto-detect Paper Code. Please enter manually.", "info");
+                }
+
+                if (data.year) {
+                    // Check if year input is empty, if so fill it, else respect user input?
+                    // User requested NO auto-fill for year generally, but maybe if empty?
+                    // Leaving valid check logic to user, but logging it.
+                    console.log("Detected Year:", data.year);
+                }
+
+            } catch (e) {
+                console.error(e);
+                showToast("Metadata detection failed", "error");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                checkExistence(); // Check after auto-detection
+            }
+        }
+
+        // Real-time check for redundancy
+        const yearInp = document.getElementById('yearInput');
+        const codeInp = document.getElementById('codeInput');
+        const submitBtn = document.querySelector('button[onclick="processUpload()"]');
+
+        async function checkExistence() {
+            const year = yearInp.value.trim();
+            const code = codeInp.value.trim();
+
+            if (!year || !code) return;
+
+            try {
+                const res = await fetch(`/api/check_paper_exists?year=${year}&code=${code}`);
+                const data = await res.json();
+
+                if (data.exists) {
+                    showToast(`Warning: Paper ${code} (${year}) already exists!`, "error");
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Paper Already Exists';
+                    submitBtn.style.background = "var(--danger)";
+                    submitBtn.style.color = "white";
+                    yearInp.style.borderColor = "var(--danger)";
+                    codeInp.style.borderColor = "var(--danger)";
+                } else {
+                    submitBtn.disabled = false;
+                    yearInp.style.borderColor = "var(--border)";
+                    codeInp.style.borderColor = "var(--border)";
+
+                    // Restore correct state based on Admin Mode
+                    const isAdminMode = typeof IS_ADMIN_MODE !== 'undefined' ? IS_ADMIN_MODE : false;
+
+                    if (isAdminMode) {
+                        submitBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Publish Live';
+                        submitBtn.style.background = '#10b981';
+                        submitBtn.style.color = 'white';
+                    } else {
+                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit for Review';
+                        submitBtn.style.background = ""; // Revert to CSS default (or set explicit if needed)
+                        submitBtn.style.color = "";
+                    }
+                }
+            } catch (e) {
+                console.error("Check failed", e);
+            }
+        }
+
+        // Attach listeners
+        yearInp.addEventListener('input', checkExistence);
+        codeInp.addEventListener('input', checkExistence);
+
+        async function processUpload() {
+            const year = yearInp.value.trim();
+            const code = codeInp.value.trim();
+
+            // Use global flag
+            const isAdminMode = typeof IS_ADMIN_MODE !== 'undefined' ? IS_ADMIN_MODE : false;
+            const adminPin = sessionStorage.getItem('GATE_ADMIN_PIN');
+
+            if (isAdminMode && !adminPin) return showToast("Session Expired. Please login from Dashboard again.", "error");
+
+            // Double check before sending
+            const checkRes = await fetch(`/api/check_paper_exists?year=${year}&code=${code}`);
+            const checkData = await checkRes.json();
+            if (checkData.exists) {
+                showToast("Cannot upload: Paper already exists.", "error");
+                return;
+            }
+
+            // Distinct validation messages for clarity
+            if (!year) return showToast("Please enter the Year", "error");
+            if (!code) return showToast("Please enter the Paper Code", "error");
+
+            // Check files
+            if (!window.uploadedKeyFile) return showToast("Missing Answer Key File. Please upload it.", "error");
+            if (!window.uploadedQPFile) return showToast("Missing Question Paper File. Please upload it.", "error");
+
+            const fd = new FormData();
+            fd.append('year', year);
+            fd.append('paper_code', code);
+            fd.append('answer_key', window.uploadedKeyFile);
+            fd.append('question_paper', window.uploadedQPFile);
+
+            // Add Mode
+            if (isAdminMode) {
+                fd.append('mode', 'live');
+            } else {
+                fd.append('mode', 'staging');
+            }
+
+            document.getElementById('loading').style.display = 'flex';
+
+            try {
+                const headers = {};
+                if (isAdminMode) headers['X-Admin-Pin'] = adminPin;
+
+                const res = await fetch('/api/upload_paper', {
+                    method: 'POST',
+                    body: fd,
+                    headers: headers
+                });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(data.message || "Paper processed successfully!", "success");
+
+                // Redirect logic
+                if (isAdminMode) {
+                    setTimeout(() => window.location.href = '/', 1500); // Live -> Home
+                } else {
+                    setTimeout(() => location.reload(), 2000); // Staging -> Refresh
+                }
+
+            } catch (e) {
+                showToast(e.message || "Upload failed", "error");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

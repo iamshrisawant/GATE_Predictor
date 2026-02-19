@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | GATE Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Dashboard Specific Overrides */
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: none;
+            max-width: 1400px;
+            /* Wider for more breath */
+            margin: 0 auto;
+            padding: 5rem 3rem;
+            /* More padding */
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            gap: 2rem;
+            /* Prevent collision */
+            flex-wrap: wrap;
+            /* Allow wrapping on small screens */
+        }
+
+        .dashboard-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.05rem;
+            background: linear-gradient(to right, #fafaf9, #a8a29e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Sections */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-container {
+            margin-bottom: 6rem;
+            /* More vertical separation between sections */
+        }
+
+        /* Paper Cards */
+        .paper-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            /* More internal padding */
+            margin-bottom: 2rem;
+            /* More external spacing */
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 3rem;
+            /* More gap between title and buttons */
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .paper-card:hover {
+            background: rgba(41, 37, 36, 0.8);
+            /* Stone 800ish */
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .paper-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .paper-info span {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: #e7e5e4;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-preview {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .btn-preview:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-approve {
+            background: rgba(132, 204, 22, 0.1);
+            /* Lime tint */
+            color: var(--success);
+        }
+
+        .btn-approve:hover {
+            background: rgba(132, 204, 22, 0.2);
+        }
+
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.1);
+            /* Red tint */
+            color: var(--danger);
+        }
+
+        .btn-reject:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+
+        .btn-solid-approve {
+            background: var(--success);
+            color: #0c0a09;
+            font-weight: 700;
+        }
+
+        .btn-solid-approve:hover {
+            background: #65a30d;
+        }
+
+        /* Darker Lime */
+
+        .btn-solid-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-solid-reject:hover {
+            background: #dc2626;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-close:hover {
+            border-color: var(--text-primary);
+        }
+
+        /* Lock Screen */
+        #pinModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 10, 9, 0.95);
+            /* Stone 950 layout */
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .lock-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .pin-input {
+            width: 100%;
+            background: rgba(12, 10, 9, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+            letter-spacing: 0.2em;
+            margin: 2rem 0;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .pin-input:focus {
+            border-color: var(--text-secondary);
+            background: rgba(12, 10, 9, 0.8);
+            box-shadow: 0 0 0 2px rgba(168, 162, 158, 0.2);
+        }
+
+        .pin-input::placeholder {
+            font-size: 1rem;
+            letter-spacing: normal;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .empty-state {
+            padding: 4rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 2px dashed var(--border);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Lock Screen -->
+    <div id="pinModal">
+        <div class="lock-card">
+            <div
+                style="width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <i class="fa-solid fa-lock" style="font-size: 1.5rem; color: var(--text-primary);"></i>
+            </div>
+            <h2 style="margin: 0; font-weight: 500;">Admin Access</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Enter PIN to continue</p>
+
+            <input type="password" id="pinInput" class="pin-input" placeholder="ENTER PIN" autofocus
+                autocomplete="new-password">
+
+            <button onclick="checkPin()" class="btn-primary" style="width: 100%; padding: 1rem; border-radius: 12px;">
+                Unlock Dashboard <i class="fa-solid fa-arrow-right" style="margin-left: 0.5rem; font-size: 0.8rem;"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container" id="mainDashboard">
+        <header class="dashboard-header">
+            <div style="text-align: left;">
+                <h1 class="dashboard-title">Dashboard</h1>
+                <p style="margin: 0.5rem 0 0; color: var(--text-secondary);">Manage submissions & live data</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/" class="btn-icon"
+                    style="color: var(--text-secondary); border: 1px solid var(--border); text-decoration: none;">
+                    <i class="fa-solid fa-home"></i>
+                </a>
+                <a href="/contribute?admin=true" class="btn-primary">
+                    <i class="fa-solid fa-cloud-upload"></i> Upload Live Data
+                </a>
+            </div>
+        </header>
+
+        <div class="card-container">
+            <h2 class="section-header">
+                <i class="fa-solid fa-circle-dot" style="color: var(--success); font-size: 0.7em;"></i> Review Queue
+            </h2>
+
+            <div id="stagingList">
+                <div class="empty-state">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Data Repository -->
+        <div class="card-container">
+            <h2 class="section-header">
+                <i class="fa-solid fa-server" style="color: #60a5fa; font-size: 0.7em;"></i> Live Data Repository
+            </h2>
+
+            <div id="liveList">
+                <div class="empty-state" style="padding: 2rem;">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2100; flex-direction: column;">
+        <!-- Modal Header -->
+        <div
+            style="background: var(--bg-color); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 id="previewTitle" style="margin: 0; font-size: 1.2rem;">Reviewing Paper</h2>
+                <span id="previewSubtitle" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="approveCurrent()" class="btn-icon btn-solid-approve">
+                    <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button onclick="rejectCurrent()" class="btn-icon btn-solid-reject">
+                    <i class="fa-solid fa-trash"></i> Reject
+                </button>
+                <button onclick="closePreview()" class="btn-icon btn-close">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body (Split View) -->
+        <div style="flex: 1; display: flex; padding: 1rem; gap: 1rem; overflow: hidden;">
+            <div
+                style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                <div
+                    style="padding: 0.5rem; text-align: center; background: rgba(0,0,0,0.3); font-size: 0.9rem; color: var(--text-secondary);">
+                    Answer Key</div>
+                <iframe id="previewKey" style="flex: 1; border: none; width: 100%; height: 100%;"></iframe>
+            </div>
+            <div
+                style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                <div
+                    style="padding: 0.5rem; text-align: center; background: rgba(0,0,0,0.3); font-size: 0.9rem; color: var(--text-secondary);">
+                    Question Paper</div>
+                <iframe id="previewQP" style="flex: 1; border: none; width: 100%; height: 100%;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use sessionStorage for session persistence
+        const PIN_KEY = 'GATE_ADMIN_PIN';
+        let currentPreview = null; // {year, code}
+
+        // Allow Enter key
+        document.getElementById('pinInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkPin();
+        });
+
+        async function checkPin() {
+            const pin = document.getElementById('pinInput').value;
+            if (!pin) return;
+
+            try {
+                const res = await fetch('/api/verify_pin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin: pin })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    sessionStorage.setItem(PIN_KEY, pin);
+                    unlockDashboard();
+                } else {
+                    alert("Incorrect PIN");
+                    document.getElementById('pinInput').value = '';
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error verifying PIN");
+            }
+        }
+
+        function unlockDashboard() {
+            document.getElementById('pinModal').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('pinModal').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+                loadStaging();
+                loadLive();
+            }, 300);
+        }
+
+        // Auto-login if session exists
+        window.onload = async () => {
+            const storedPin = sessionStorage.getItem(PIN_KEY);
+            if (storedPin) {
+                // Verify stored PIN is still valid
+                try {
+                    const res = await fetch('/api/verify_pin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pin: storedPin })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        unlockDashboard();
+                    } else {
+                        sessionStorage.removeItem(PIN_KEY); // Invalid pin
+                    }
+                } catch (e) {
+                    console.log("Session validation failed", e);
+                }
+            }
+        };
+
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-Admin-Pin': sessionStorage.getItem(PIN_KEY)
+            };
+        }
+
+        async function loadStaging() {
+            try {
+                const res = await fetch('/api/staging_queue');
+                const queue = await res.json();
+                const container = document.getElementById('stagingList');
+                container.innerHTML = '';
+
+                if (queue.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <p>All clear! No pending submissions.</p>
+                    </div>`;
+                    return;
+                }
+
+                queue.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'paper-card';
+                    card.innerHTML = `
+                    <div class="paper-info">
+                        <h3><i class="fa-solid fa-file-pdf"></i> ${item.code}</h3>
+                        <span>GATE ${item.year}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-icon btn-preview" 
+                                onclick="openPreview('${item.year}', '${item.code}')">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </button>
+                        <button class="btn-icon btn-approve" onclick="approve('${item.year}', '${item.code}')">
+                            <i class="fa-solid fa-check"></i> Approve
+                        </button>
+                        <button class="btn-icon btn-reject" onclick="reject('${item.year}', '${item.code}')">
+                            <i class="fa-solid fa-trash"></i> Reject
+                        </button>
+                    </div>
+                `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.error(e);
+                document.getElementById('stagingList').innerHTML = '<p style="color:red">Error loading queue.</p>';
+            }
+        }
+
+        function openPreview(year, code) {
+            currentPreview = { year, code };
+            document.getElementById('previewTitle').innerText = `${code} (${year})`;
+            document.getElementById('previewSubtitle').innerText = "Reviewing Staged Files";
+
+            // Load Iframes
+            document.getElementById('previewKey').src = `/api/staging_file?year=${year}&code=${code}&file=answer_key.pdf`;
+            document.getElementById('previewQP').src = `/api/staging_file?year=${year}&code=${code}&file=question_paper.pdf`;
+
+            const modal = document.getElementById('previewModal');
+            modal.style.display = 'flex';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+            document.getElementById('previewKey').src = '';
+            document.getElementById('previewQP').src = '';
+            currentPreview = null;
+        }
+
+        function approveCurrent() {
+            if (currentPreview) approve(currentPreview.year, currentPreview.code);
+            closePreview();
+        }
+
+        function rejectCurrent() {
+            if (currentPreview) reject(currentPreview.year, currentPreview.code);
+            closePreview();
+        }
+
+        async function approve(year, code) {
+            if (!confirm(`Approve ${code} (${year})? This will make it LIVE.`)) return;
+
+            const res = await fetch('/api/approve_paper', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ year, code })
+            });
+
+            if (res.ok) {
+                loadStaging();
+            } else {
+                alert("Error approving paper: " + res.statusText);
+            }
+        }
+
+        async function reject(year, code) {
+            if (!confirm(`Delete ${code} (${year})? This cannot be undone.`)) return;
+
+            const res = await fetch('/api/reject_paper', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ year, code })
+            });
+
+            if (res.ok) {
+                loadStaging();
+            } else {
+                alert("Error rejecting paper: " + res.statusText);
+            }
+        }
+
+        async function loadLive() {
+            try {
+                const res = await fetch('/api/live_papers');
+                const list = await res.json();
+                const container = document.getElementById('liveList');
+                container.innerHTML = '';
+
+                if (list.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <p>No live data found.</p>
+                    </div>`;
+                    return;
+                }
+
+                list.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'paper-card';
+                    card.style.borderColor = "rgba(96, 165, 250, 0.2)"; // Blueish tint for Live
+                    card.innerHTML = `
+                    <div class="paper-info">
+                        <h3 style="color: var(--text-primary);"><i class="fa-solid fa-database" style="color:#60a5fa; margin-right:0.5rem;"></i> ${item.code}</h3>
+                        <span>GATE ${item.year}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-icon btn-reject" onclick="deleteLive('${item.year}', '${item.code}')" title="Delete from Live">
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                    </div>
+                `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.error(e);
+                document.getElementById('liveList').innerHTML = '<p style="color:red">Error loading live data.</p>';
+            }
+        }
+
+        async function deleteLive(year, code) {
+            const confirmMsg = prompt(`WARNING: You are about to DELETE ${code} (${year}) from the LIVE server.\n\nThis cannot be undone. Any users currently using this paper will be affected.\n\nPlease type "DELETE" to confirm.`);
+
+            if (confirmMsg === "DELETE") {
+                try {
+                    const res = await fetch('/api/delete_live_paper', {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ year, code })
+                    });
+
+                    if (res.ok) {
+                        loadLive();
+                    } else {
+                        const err = await res.json();
+                        alert("Error: " + (err.error || res.statusText));
+                    }
+
+                } catch (e) {
+                    alert("Error deleting: " + e);
+                }
+            } else if (confirmMsg !== null) {
+                alert("Deletion cancelled. Type DELETE exactly to confirm.");
+            }
+        }
+    </script>
+</body>
+
+</html>
