@@ -460,3 +460,43 @@ select:disabled {
     cursor: not-allowed;
     background-color: rgba(0, 0, 0, 0.2);
 }
+
+/* Auth Pin Input (Decoupled) */
+.pin-input {
+    width: 90%;
+    background: rgba(12, 10, 9, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    /* Match button height exactly */
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    text-align: center;
+    letter-spacing: 0.25em;
+    /* Slightly wider */
+    margin: 1.5rem 0 1rem 0;
+    /* Balanced vertical rhythm */
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pin-input:focus {
+    border-color: var(--text-secondary);
+    background: rgba(12, 10, 9, 0.8);
+    box-shadow: 0 0 0 4px rgba(168, 162, 158, 0.1);
+}
+
+.pin-input::placeholder {
+    font-size: 1rem;
+    letter-spacing: normal;
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+/* Short Code Input (Year/Paper) - Decoupled from generic text */
+.short-code-input {
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
