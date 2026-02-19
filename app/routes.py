@@ -106,6 +106,8 @@ def upload_paper():
             return jsonify({"message": f"Submitted {code} ({year}) for review!"})
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @main_bp.route('/api/papers', methods=['GET'])

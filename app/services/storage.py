@@ -18,7 +18,12 @@ class StorageService:
         self.supabase_key = os.getenv("SUPABASE_KEY")
         self.bucket = "gate_papers"
         
-        if self.mode == "supabase" and self.supabase_url and self.supabase_key:
+        if self.mode == "supabase":
+            if not (self.supabase_url and self.supabase_key):
+                 print("[Storage Error] STORAGE_TYPE=supabase but credentials missing!")
+                 # Raise error to prevent silent failure in production
+                 raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY env vars")
+            
             from supabase import create_client
             self.client = create_client(self.supabase_url, self.supabase_key)
             print("[Storage] Initialized Supabase Storage")
