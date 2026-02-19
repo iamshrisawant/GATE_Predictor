@@ -21,9 +21,6 @@ def send_approval_email(year, code, attachments=None):
         print("[EMAIL WARNING] SMTP credentials not set. Email skipped.")
         return
 
-    token = serializer.dumps({"year": year, "code": code, "action": "approve"}, salt="approve-paper")
-    approve_link = f"{BASE_URL}/api/approve_token/{token}"
-    
     subject = f"GATE Predictor: New Submission {code} ({year})"
     body = f"""
     <h2>New Submission for Review</h2>
@@ -33,14 +30,16 @@ def send_approval_email(year, code, attachments=None):
         <li><strong>Year:</strong> {year}</li>
     </ul>
     <p>
-        <a href="{approve_link}" style="background:#10b981; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
-            Approve & Publish Live
+        Please log in to the admin dashboard to review and approve this submission.
+    </p>
+    <p>
+        <a href="{BASE_URL}/dashboard" style="background:#3b82f6; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+            Go to Admin Dashboard
         </a>
     </p>
-    <p>Or visit the <a href="{BASE_URL}/dashboard">Admin Dashboard</a> to review.</p>
     """
     
-    print(f"\n[EMAIL DEBUG] To Admin ({SMTP_EMAIL}):\nSubject: {subject}\nLink: {approve_link}\n")
+    print(f"\n[EMAIL DEBUG] To Admin ({SMTP_EMAIL}):\nSubject: {subject}\n")
     
     try:
         msg = MIMEMultipart()
@@ -63,13 +62,16 @@ def send_approval_email(year, code, attachments=None):
                 except Exception as ex:
                     print(f"[EMAIL ERROR] Failed to attach {item.get('name')}: {ex}")
         
+        print(f"[EMAIL DEBUG] Connecting to SMTP Server: {SMTP_SERVER}:{SMTP_PORT}...", flush=True)
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
+            print("[EMAIL DEBUG] Logging in...", flush=True)
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            print("[EMAIL DEBUG] Sending message...", flush=True)
             server.send_message(msg)
-        print("[EMAIL] Sent successfully.")
+        print("[EMAIL] Sent successfully.", flush=True)
     except Exception as e:
-        print(f"[EMAIL ERROR] Failed to send: {e}")
+        print(f"[EMAIL ERROR] Failed to send: {e}", flush=True)
 
 def send_approval_email_async(year, code, attachments=None):
     # Wrapper for threading

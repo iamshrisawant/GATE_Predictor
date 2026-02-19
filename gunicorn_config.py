@@ -1,6 +1,6 @@
 import os
 
-workers = int(os.environ.get('GUNICORN_WORKERS', '2'))
+workers = int(os.environ.get('GUNICORN_WORKERS', '1'))
 threads = int(os.environ.get('GUNICORN_THREADS', '4'))
 timeout = int(os.environ.get('GUNICORN_TIMEOUT', '120'))
 port = os.environ.get('PORT', '8080')

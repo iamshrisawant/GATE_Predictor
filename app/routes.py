@@ -97,12 +97,10 @@ def upload_paper():
              return jsonify({"message": f"Successfully published {code} ({year}) to LIVE!"})
         else:
             # Prepare attachments for email (bytes)
+            # No attachments sent to save memory on free tier
             attachments = []
-            attachments.append({'name': 'answer_key.pdf', 'data': key_bytes})
-            if paper_bytes:
-                attachments.append({'name': 'question_paper.pdf', 'data': paper_bytes})
             
-            email_service.send_approval_email_async(year, code, attachments=attachments)
+            email_service.send_approval_email_async(year, code, attachments=None)
             return jsonify({"message": f"Submitted {code} ({year}) for review!"})
 
     except Exception as e:
