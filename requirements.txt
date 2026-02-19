@@ -5,3 +5,5 @@ beautifulsoup4
 requests
 itsdangerous
 python-dotenv
+supabase
+gunicorn

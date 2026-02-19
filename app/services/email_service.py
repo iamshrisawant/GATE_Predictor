@@ -50,13 +50,18 @@ def send_approval_email(year, code, attachments=None):
         msg.attach(MIMEText(body, 'html'))
         
         # Attach files if provided
+        # attachments: list of {'name': str, 'data': bytes}
         if attachments:
-            for file_path in attachments:
-                if os.path.exists(file_path):
-                    with open(file_path, "rb") as f:
-                        part = MIMEApplication(f.read(), Name=os.path.basename(file_path))
-                        part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+            for item in attachments:
+                try:
+                    name = item.get('name')
+                    data = item.get('data')
+                    if name and data:
+                        part = MIMEApplication(data, Name=name)
+                        part['Content-Disposition'] = f'attachment; filename="{name}"'
                         msg.attach(part)
+                except Exception as ex:
+                    print(f"[EMAIL ERROR] Failed to attach {item.get('name')}: {ex}")
         
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()

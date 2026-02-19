@@ -1,25 +1,20 @@
-from flask import Blueprint, request, jsonify, render_template, send_from_directory
+from flask import Blueprint, request, jsonify, render_template, send_file, current_app
 import os
-import shutil
 import json
+import io
 from .services import extraction, scoring, email_service
 
 main_bp = Blueprint('main', __name__)
 
-DATA_FOLDER = os.path.join(os.getcwd(), 'data')
-LIVE_FOLDER = os.path.join(DATA_FOLDER, 'live')
-STAGING_FOLDER = os.path.join(DATA_FOLDER, 'staging')
 ADMIN_PIN = os.getenv("ADMIN_PIN")
-
-# Ensure dirs exist
-os.makedirs(LIVE_FOLDER, exist_ok=True)
-os.makedirs(STAGING_FOLDER, exist_ok=True)
 
 @main_bp.route('/')
 def index():
     return render_template('index.html')
 
-
+@main_bp.route('/admin')
+def admin():
+    return render_template('admin.html')
 
 @main_bp.route('/dashboard')
 def dashboard():
@@ -37,18 +32,21 @@ def detect_meta():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    temp_path = os.path.join(DATA_FOLDER, "temp_" + file.filename)
-    file.save(temp_path)
+    # Read file into memory
+    file_bytes = file.read()
+    file_stream = io.BytesIO(file_bytes)
     
     try:
-        meta = extraction.detect_metadata(temp_path)
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-    return jsonify(meta)
+        # extraction.detect_metadata now supports streams
+        meta = extraction.detect_metadata(file_stream, filename=file.filename)
+        return jsonify(meta)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @main_bp.route('/api/upload_paper', methods=['POST'])
 def upload_paper():
+    storage = current_app.storage
+    
     if 'answer_key' not in request.files:
         return jsonify({"error": "Answer Key file is required"}), 400
         
@@ -66,57 +64,71 @@ def upload_paper():
     if mode == 'live':
         if admin_pin != ADMIN_PIN:
             return jsonify({"error": "Invalid Admin PIN for Live Upload"}), 403
-        target_root = LIVE_FOLDER
+        target_root = "live"
     else:
-        target_root = STAGING_FOLDER
+        target_root = "staging"
 
-    target_dir = os.path.join(target_root, year, code)
-    os.makedirs(target_dir, exist_ok=True)
+    # Define paths
+    base_dir = f"{target_root}/{year}/{code}"
+    key_path = f"{base_dir}/answer_key.pdf"
+    paper_path = f"{base_dir}/question_paper.pdf"
     
-    key_path = os.path.join(target_dir, "answer_key.pdf")
-    key_file.save(key_path)
-    
+    # Read files to memory
+    key_bytes = key_file.read()
+    paper_bytes = None
     if paper_file:
-        paper_path = os.path.join(target_dir, "question_paper.pdf")
-        paper_file.save(paper_path)
-        
+        paper_bytes = paper_file.read()
+
     try:
-        schema_path = os.path.join(target_dir, "schema.json")
-        extraction.extract_answer_key(key_path, schema_path, paper_code=code)
+        # 1. Save Files via Storage
+        storage.save(key_path, key_bytes)
+        if paper_bytes:
+            storage.save(paper_path, paper_bytes)
+        
+        # 2. Extract Key from Memory Stream
+        key_stream = io.BytesIO(key_bytes)
+        schema = extraction.extract_answer_key(key_stream, config_path=None, paper_code=code)
+        
+        # 3. Save Schema
+        schema_path = f"{base_dir}/schema.json"
+        storage.save_json(schema_path, schema)
         
         if mode == 'live':
              return jsonify({"message": f"Successfully published {code} ({year}) to LIVE!"})
         else:
-            attachments = [key_path]
-            if paper_file:
-                attachments.append(paper_path)
+            # Prepare attachments for email (bytes)
+            attachments = []
+            attachments.append({'name': 'answer_key.pdf', 'data': key_bytes})
+            if paper_bytes:
+                attachments.append({'name': 'question_paper.pdf', 'data': paper_bytes})
             
             email_service.send_approval_email_async(year, code, attachments=attachments)
             return jsonify({"message": f"Submitted {code} ({year}) for review!"})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @main_bp.route('/api/papers', methods=['GET'])
 def list_papers():
+    storage = current_app.storage
     tree = {}
-    if not os.path.exists(LIVE_FOLDER):
-        return jsonify(tree)
-        
-    for year in os.listdir(LIVE_FOLDER):
-        year_path = os.path.join(LIVE_FOLDER, year)
-        if not os.path.isdir(year_path): continue
-        
+    
+    # List Years in 'live'
+    years = storage.list("live")
+    for year in years:
         tree[year] = []
-        for code in os.listdir(year_path):
-            code_path = os.path.join(year_path, code)
-            if not os.path.isdir(code_path): continue
-            
-            if os.path.exists(os.path.join(code_path, "schema.json")):
+        # List Codes in 'live/year'
+        codes = storage.list(f"live/{year}")
+        for code in codes:
+            # Check if schema exists
+            if storage.exists(f"live/{year}/{code}/schema.json"):
                 tree[year].append(code)
+    
     return jsonify(tree)
 
 @main_bp.route('/api/calculate', methods=['POST'])
 def calculate():
+    storage = current_app.storage
     data = request.json
     url = data.get('url')
     year = data.get('year')
@@ -125,14 +137,15 @@ def calculate():
     if not all([url, year, code]):
         return jsonify({"error": "Missing required fields (url, year, code)"}), 400
     
-    schema_path = os.path.join(LIVE_FOLDER, year, code, "schema.json")
+    schema_path = f"live/{year}/{code}/schema.json"
     
-    if not os.path.exists(schema_path):
+    if not storage.exists(schema_path):
         return jsonify({"error": "Paper not found on server."}), 404
         
     try:
-        with open(schema_path, 'r') as f:
-            schema = json.load(f)
+        schema = storage.read_json(schema_path)
+        if not schema:
+             return jsonify({"error": "Failed to read schema."}), 500
             
         report = scoring.calculate_score(url, schema)
         if "error" in report:
@@ -143,56 +156,68 @@ def calculate():
 
 @main_bp.route('/api/check_paper_exists', methods=['GET'])
 def check_paper_exists():
+    storage = current_app.storage
     year = request.args.get('year')
     code = request.args.get('code')
     if not year or not code:
         return jsonify({"exists": False})
-    schema_path = os.path.join(LIVE_FOLDER, year, code.upper(), "schema.json")
-    return jsonify({"exists": os.path.exists(schema_path)})
+    
+    path = f"live/{year}/{code.upper()}/schema.json"
+    return jsonify({"exists": storage.exists(path)})
 
 @main_bp.route('/api/staging_file')
 def staging_file():
+    storage = current_app.storage
     year = request.args.get('year')
     code = request.args.get('code')
     filename = request.args.get('file')
+    
     if not (year and code and filename):
         return "Missing parameters", 400
-    directory = os.path.join(STAGING_FOLDER, year, code)
-    if not os.path.exists(directory):
-        return "Paper not found", 404
-    return send_from_directory(directory, filename)
+        
+    path = f"staging/{year}/{code}/{filename}"
+    data = storage.read(path)
+    
+    if not data:
+        return "File not found", 404
+        
+    return send_file(
+        io.BytesIO(data),
+        download_name=filename,
+        as_attachment=False # Inline view
+    )
 
 @main_bp.route('/api/approve_token/<token>', methods=['GET'])
 def approve_token(token):
-
+    storage = current_app.storage
     try:
         data = email_service.serializer.loads(token, salt="approve-paper", max_age=86400)
         year = data['year']
         code = data['code']
         
-        src = os.path.join(STAGING_FOLDER, year, code)
-        dst = os.path.join(LIVE_FOLDER, year, code)
+        src = f"staging/{year}/{code}"
+        dst = f"live/{year}/{code}"
         
-        if not os.path.exists(src):
-            return "Error: Paper not found in staging", 404
-            
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        if os.path.exists(dst): shutil.rmtree(dst)
-        shutil.move(src, dst)
+        # Check if src exists (by checking schema)
+        if not storage.exists(f"{src}/schema.json"):
+             return "Error: Paper not found in staging", 404
+
+        storage.move(src, dst)
         return f"<h1>Success!</h1><p>Paper {code} ({year}) has been approved and is now LIVE.</p><a href='/'>Go to App</a>"
     except Exception as e:
         return f"Invalid or Expired Token: {str(e)}", 400
 
 @main_bp.route('/api/staging_queue', methods=['GET'])
 def staging_queue():
+    storage = current_app.storage
     queue = []
-    if not os.path.exists(STAGING_FOLDER):
-        return jsonify(queue)
-    for year in os.listdir(STAGING_FOLDER):
-        year_path = os.path.join(STAGING_FOLDER, year)
-        if not os.path.isdir(year_path): continue
-        for code in os.listdir(year_path):
-            queue.append({"year": year, "code": code})
+    
+    years = storage.list("staging")
+    for year in years:
+        codes = storage.list(f"staging/{year}")
+        for code in codes:
+             queue.append({"year": year, "code": code})
+             
     return jsonify(queue)
 
 def verify_request_pin(req):
@@ -211,53 +236,64 @@ def verify_pin_route():
 
 @main_bp.route('/api/approve_paper', methods=['POST'])
 def approve_paper():
+    storage = current_app.storage
     if not verify_request_pin(request): return jsonify({"error": "Unauthorized"}), 401
+    
     data = request.json
     year = data.get('year')
     code = data.get('code')
-    src = os.path.join(STAGING_FOLDER, year, code)
-    dst = os.path.join(LIVE_FOLDER, year, code)
-    if not os.path.exists(src): return jsonify({"error": "Not found"}), 404
-    os.makedirs(os.path.dirname(dst), exist_ok=True)
-    if os.path.exists(dst): shutil.rmtree(dst)
-    shutil.move(src, dst)
+    
+    src = f"staging/{year}/{code}"
+    dst = f"live/{year}/{code}"
+    
+    if not storage.exists(f"{src}/schema.json"):
+        return jsonify({"error": "Not found"}), 404
+        
+    storage.move(src, dst)
     return jsonify({"message": "Approved"})
 
 @main_bp.route('/api/reject_paper', methods=['POST'])
 def reject_paper():
+    storage = current_app.storage
     if not verify_request_pin(request): return jsonify({"error": "Unauthorized"}), 401
+    
     data = request.json
     year = data.get('year')
     code = data.get('code')
-    src = os.path.join(STAGING_FOLDER, year, code)
-    if os.path.exists(src):
-        shutil.rmtree(src)
-        return jsonify({"message": "Rejected"})
-    return jsonify({"error": "Not found"}), 404
+    
+    src = f"staging/{year}/{code}"
+    
+    # storage.delete removes files/folders
+    # We should delete the folder
+    storage.delete(src)
+    return jsonify({"message": "Rejected"})
 
 @main_bp.route('/api/live_papers', methods=['GET'])
 def live_papers():
+    storage = current_app.storage
     papers = []
-    if not os.path.exists(LIVE_FOLDER): return jsonify(papers)
-    for year in os.listdir(LIVE_FOLDER):
-        year_path = os.path.join(LIVE_FOLDER, year)
-        if not os.path.isdir(year_path): continue
-        for code in os.listdir(year_path):
+    
+    years = storage.list("live")
+    for year in years:
+        codes = storage.list(f"live/{year}")
+        for code in codes:
             papers.append({"year": year, "code": code})
+            
     papers.sort(key=lambda x: (x['year'], x['code']), reverse=True)
     return jsonify(papers)
 
 @main_bp.route('/api/delete_live_paper', methods=['POST'])
 def delete_live_paper():
+    storage = current_app.storage
     if not verify_request_pin(request): return jsonify({"error": "Unauthorized"}), 401
+    
     data = request.json
     year = data.get('year')
     code = data.get('code')
-    target = os.path.join(LIVE_FOLDER, year, code)
-    if os.path.exists(target):
-        try:
-            shutil.rmtree(target)
-            return jsonify({"message": f"Deleted {code} ({year}) from Live."})
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-    return jsonify({"error": "Paper not found"}), 404
+    
+    target = f"live/{year}/{code}"
+    try:
+        storage.delete(target)
+        return jsonify({"message": f"Deleted {code} ({year}) from Live."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

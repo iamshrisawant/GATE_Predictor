@@ -2,11 +2,16 @@ import pdfplumber
 import json
 import re
 import os
+import io
 
-def extract_answer_key(pdf_path, output_path, paper_code=None):
+def extract_answer_key(source, output_path=None, paper_code=None):
+    """
+    source: filepath (str) or file-like object (BytesIO)
+    """
     schema = {}
     
-    with pdfplumber.open(pdf_path) as pdf:
+    # pdfplumber.open supports both path and file-like objects
+    with pdfplumber.open(source) as pdf:
         for page in pdf.pages:
             tables = page.extract_tables()
             for table in tables:
@@ -52,19 +57,24 @@ def extract_answer_key(pdf_path, output_path, paper_code=None):
                     }
 
     print(f"Extracted {len(schema)} keys.")
-    if output_path:
-        with open(output_path, "w") as f:
-            json.dump(schema, f, indent=4)
-        print(f"Saved schema to {output_path}")
+    if output_path and isinstance(output_path, str):
+        # Only write to file if output_path is provided and is string (local mode usually)
+        # For cloud/bytes, we expect the caller to handle specific saving if needed
+        # But for backward compatibility with local mode, we try to save if it looks like a path
+        try:
+             with open(output_path, "w") as f:
+                json.dump(schema, f, indent=4)
+             print(f"Saved schema to {output_path}")
+        except:
+             pass 
     
     return schema
 
-def detect_metadata(pdf_path):
+def detect_metadata(source, filename=""):
     """
-    Attempts to extract Year, Paper Code, and Set from PDF filename or content.
-    Returns dict: {'year': str, 'paper_code': str, 'set_no': str}
+    source: filepath (str) or file-like object
+    filename: original filename (str) for fallback detection
     """
-    filename = os.path.basename(pdf_path)
     meta = {
         "year": "", 
         "paper_code": ""
@@ -72,7 +82,7 @@ def detect_metadata(pdf_path):
     
     # 1. Try Content First (Most Reliable)
     try:
-        with pdfplumber.open(pdf_path) as pdf:
+        with pdfplumber.open(source) as pdf:
             # Check first page text
             text = pdf.pages[0].extract_text()
             if text:
@@ -82,7 +92,7 @@ def detect_metadata(pdf_path):
                     meta["year"] = y_match.group(1)
                 else:
                     # Fallback: look for 202x in first page
-                    y_weak = re.search(r"\\b(202\d)\\b", text)
+                    y_weak = re.search(r"\b(202\d)\b", text)
                     if y_weak:
                         meta["year"] = y_weak.group(1)
 
@@ -109,25 +119,24 @@ def detect_metadata(pdf_path):
         print(f"Error reading PDF content: {e}")
 
     # 2. Fallback to Filename if missing
-    if not meta["year"]:
-        y_short = re.search(r"([A-Z]{2})(\d{2})", filename) 
-        if y_short:
-             meta["year"] = "20" + y_short.group(2)
-        else:
-             y_full = re.search(r"GATE[-_]?\s?(20\d{2})", filename, re.IGNORECASE)
-             if y_full:
-                 meta["year"] = y_full.group(1)
-    
-
-
-    if not meta["paper_code"]:
-        codes = "AE|AG|AR|BM|BT|CE|CH|CS|CY|DA|EC|EE|ES|EY|GE|GG|IN|MA|ME|MN|MT|NM|PE|PH|PI|ST|TF|XE|XH|XL"
-        c_match = re.search(rf"({codes})([1-9])(?!\d)", filename, re.IGNORECASE)
-        if c_match:
-             meta["paper_code"] = c_match.group(1).upper() + c_match.group(2)
-        else:
-            c_match = re.search(rf"({codes})", filename, re.IGNORECASE)
+    if filename:
+        if not meta["year"]:
+            y_short = re.search(r"([A-Z]{2})(\d{2})", filename) 
+            if y_short:
+                 meta["year"] = "20" + y_short.group(2)
+            else:
+                 y_full = re.search(r"GATE[-_]?\s?(20\d{2})", filename, re.IGNORECASE)
+                 if y_full:
+                     meta["year"] = y_full.group(1)
+        
+        if not meta["paper_code"]:
+            codes = "AE|AG|AR|BM|BT|CE|CH|CS|CY|DA|EC|EE|ES|EY|GE|GG|IN|MA|ME|MN|MT|NM|PE|PH|PI|ST|TF|XE|XH|XL"
+            c_match = re.search(rf"({codes})([1-9])(?!\d)", filename, re.IGNORECASE)
             if c_match:
-                meta["paper_code"] = c_match.group(1).upper()
+                 meta["paper_code"] = c_match.group(1).upper() + c_match.group(2)
+            else:
+                c_match = re.search(rf"({codes})", filename, re.IGNORECASE)
+                if c_match:
+                    meta["paper_code"] = c_match.group(1).upper()
             
     return meta

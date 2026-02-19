@@ -14,6 +14,9 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
     
     # Init Services
+    from .services.storage import StorageService
+    app.storage = StorageService(app)
+
     from .services.email_service import init_email_service
     init_email_service(app)
     
