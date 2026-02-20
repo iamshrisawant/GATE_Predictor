@@ -29,7 +29,7 @@ def calculate_score(html_path, schema_data_or_path):
     # Pre-compile regexes for efficiency
     subject_regexes = {}
     for subj in active_subjects:
-        pattern = rf"_{subj.lower()}\d*q(\d+)"
+        pattern = rf"_{re.escape(subj.lower())}[a-z0-9]*q(\d+)"
         subject_regexes[subj] = re.compile(pattern)
 
     # Read HTML content
