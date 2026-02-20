@@ -1,0 +1,674 @@
+{
+    "GA_1": {
+        "question_no": 1,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GA_2": {
+        "question_no": 2,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 1.0
+    },
+    "GA_3": {
+        "question_no": 3,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GA_4": {
+        "question_no": 4,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GA_5": {
+        "question_no": 5,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GA_6": {
+        "question_no": 6,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 2.0
+    },
+    "GA_7": {
+        "question_no": 7,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 2.0
+    },
+    "GA_8": {
+        "question_no": 8,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "MTA*",
+        "marks": 2.0
+    },
+    "GA_9": {
+        "question_no": 9,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GA_10": {
+        "question_no": 10,
+        "section": "GA",
+        "original_section": "GA",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 2.0
+    },
+    "GE_11": {
+        "question_no": 11,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GE_12": {
+        "question_no": 12,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_13": {
+        "question_no": 13,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 1.0
+    },
+    "GE_14": {
+        "question_no": 14,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 1.0
+    },
+    "GE_15": {
+        "question_no": 15,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_16": {
+        "question_no": 16,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GE_17": {
+        "question_no": 17,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_18": {
+        "question_no": 18,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_19": {
+        "question_no": 19,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_20": {
+        "question_no": 20,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_21": {
+        "question_no": 21,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_22": {
+        "question_no": 22,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_23": {
+        "question_no": 23,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MSQ",
+        "key": "A;B;D",
+        "marks": 1.0
+    },
+    "GE_24": {
+        "question_no": 24,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MSQ",
+        "key": "B;C;D",
+        "marks": 1.0
+    },
+    "GE_25": {
+        "question_no": 25,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "1.67 to 1.69",
+        "marks": 1.0
+    },
+    "GE_26": {
+        "question_no": 26,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "3 to 3",
+        "marks": 1.0
+    },
+    "GE_27": {
+        "question_no": 27,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "0.01 to 0.01",
+        "marks": 1.0
+    },
+    "GE_28": {
+        "question_no": 28,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 2.0
+    },
+    "GE_29": {
+        "question_no": 29,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_30": {
+        "question_no": 30,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 2.0
+    },
+    "GE_31": {
+        "question_no": 31,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_32": {
+        "question_no": 32,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_33": {
+        "question_no": 33,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_34": {
+        "question_no": 34,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_35": {
+        "question_no": 35,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_36": {
+        "question_no": 36,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_37": {
+        "question_no": 37,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MSQ",
+        "key": "C;D",
+        "marks": 2.0
+    },
+    "GE_38": {
+        "question_no": 38,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "MSQ",
+        "key": "A;B;C",
+        "marks": 2.0
+    },
+    "GE_39": {
+        "question_no": 39,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "27.15 to 27.30",
+        "marks": 2.0
+    },
+    "GE_40": {
+        "question_no": 40,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "0.09 to 0.11",
+        "marks": 2.0
+    },
+    "GE_41": {
+        "question_no": 41,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "0.95 to 0.98",
+        "marks": 2.0
+    },
+    "GE_42": {
+        "question_no": 42,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "7.25 to 7.45",
+        "marks": 2.0
+    },
+    "GE_43": {
+        "question_no": 43,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "408 to 410",
+        "marks": 2.0
+    },
+    "GE_44": {
+        "question_no": 44,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "1.14 to 1.34",
+        "marks": 2.0
+    },
+    "GE_45": {
+        "question_no": 45,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "0.25 to 0.27",
+        "marks": 2.0
+    },
+    "GE_46": {
+        "question_no": 46,
+        "section": "GE",
+        "original_section": "GE-A",
+        "question_type": "NAT",
+        "key": "600 to 600",
+        "marks": 2.0
+    },
+    "GE_47": {
+        "question_no": 47,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_48": {
+        "question_no": 48,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 1.0
+    },
+    "GE_49": {
+        "question_no": 49,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_50": {
+        "question_no": 50,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_51": {
+        "question_no": 51,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_52": {
+        "question_no": 52,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_53": {
+        "question_no": 53,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GE_54": {
+        "question_no": 54,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 1.0
+    },
+    "GE_55": {
+        "question_no": 55,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_56": {
+        "question_no": 56,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_57": {
+        "question_no": 57,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_58": {
+        "question_no": 58,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_59": {
+        "question_no": 59,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MSQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_60": {
+        "question_no": 60,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "MSQ",
+        "key": "A;B",
+        "marks": 2.0
+    },
+    "GE_61": {
+        "question_no": 61,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "NAT",
+        "key": "59.78 to 59.88",
+        "marks": 2.0
+    },
+    "GE_62": {
+        "question_no": 62,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "NAT",
+        "key": "749.79 to 750.20",
+        "marks": 2.0
+    },
+    "GE_63": {
+        "question_no": 63,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "NAT",
+        "key": "136.770 to 136.790",
+        "marks": 2.0
+    },
+    "GE_64": {
+        "question_no": 64,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "NAT",
+        "key": "1.540 to 1.550",
+        "marks": 2.0
+    },
+    "GE_65": {
+        "question_no": 65,
+        "section": "GE",
+        "original_section": "GE-B-SI",
+        "question_type": "NAT",
+        "key": "4 to 4",
+        "marks": 2.0
+    },
+    "GE_66": {
+        "question_no": 66,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 1.0
+    },
+    "GE_67": {
+        "question_no": 67,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "D",
+        "marks": 1.0
+    },
+    "GE_68": {
+        "question_no": 68,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 1.0
+    },
+    "GE_69": {
+        "question_no": 69,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MSQ",
+        "key": "B;D",
+        "marks": 1.0
+    },
+    "GE_70": {
+        "question_no": 70,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "3.71 to 3.75",
+        "marks": 1.0
+    },
+    "GE_71": {
+        "question_no": 71,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "220 to 220",
+        "marks": 1.0
+    },
+    "GE_72": {
+        "question_no": 72,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "1.95 to 1.97",
+        "marks": 1.0
+    },
+    "GE_73": {
+        "question_no": 73,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "10 to 10",
+        "marks": 1.0
+    },
+    "GE_74": {
+        "question_no": 74,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_75": {
+        "question_no": 75,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "B",
+        "marks": 2.0
+    },
+    "GE_76": {
+        "question_no": 76,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "A",
+        "marks": 2.0
+    },
+    "GE_77": {
+        "question_no": 77,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MCQ",
+        "key": "C",
+        "marks": 2.0
+    },
+    "GE_78": {
+        "question_no": 78,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MSQ",
+        "key": "A;B",
+        "marks": 2.0
+    },
+    "GE_79": {
+        "question_no": 79,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MSQ",
+        "key": "A;D",
+        "marks": 2.0
+    },
+    "GE_80": {
+        "question_no": 80,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MSQ",
+        "key": "B;D",
+        "marks": 2.0
+    },
+    "GE_81": {
+        "question_no": 81,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "MSQ",
+        "key": "A;B;D",
+        "marks": 2.0
+    },
+    "GE_82": {
+        "question_no": 82,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "0.28 to 0.32",
+        "marks": 2.0
+    },
+    "GE_83": {
+        "question_no": 83,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "11 to 11",
+        "marks": 2.0
+    },
+    "GE_84": {
+        "question_no": 84,
+        "section": "GE",
+        "original_section": "GE-B-SII",
+        "question_type": "NAT",
+        "key": "90.0 to 91.0",
+        "marks": 2.0
+    }
+}

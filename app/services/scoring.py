@@ -173,12 +173,18 @@ def calculate_score(html_path, schema_data_or_path):
                 display_key = ";".join(sorted([x.strip() for x in official_key.replace(";", ",").split(",") if x.strip()]))
 
         # --- SCORING LOGIC ---
+        # --- SCORING LOGIC ---
+        is_mta = "MTA" in official_key.upper()
+        
         if user_ans:
             attempted += 1
             is_correct = False
             marks_gained = 0.0
 
-            if q_type == "MCQ":
+            if is_mta:
+                is_correct = True
+                marks_gained = max_marks
+            elif q_type == "MCQ":
                 if user_ans == display_key:
                     is_correct = True
                     marks_gained = max_marks
