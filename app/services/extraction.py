@@ -4,12 +4,50 @@ import re
 import os
 import io
 
-def extract_answer_key(source, output_path=None, paper_code=None):
+def extract_marks_from_paper(source):
+    """
+    Extracts mappings of Question Number -> Marks (1.0 or 2.0) from the Question Paper text.
+    Returns: dict mapping str(q_no) -> float(marks)
+    """
+    marks_map = {}
+    if not source:
+        return marks_map
+
+    # Need to seek back to 0 if it's a stream
+    if hasattr(source, 'seek'):
+        source.seek(0)
+        
+    try:
+        with pdfplumber.open(source) as pdf:
+            text = "".join(page.extract_text() or "" for page in pdf.pages)
+            # Find Q.X - Q.Y Carry ONE/TWO mark
+            matches = re.finditer(r"Q\.(\d+)[^\d]+Q\.(\d+)\s+Carry\s+(ONE|TWO)\s+mark", text, re.IGNORECASE)
+            for m in matches:
+                start = int(m.group(1))
+                end = int(m.group(2))
+                mark_val = 1.0 if m.group(3).upper() == "ONE" else 2.0
+                for q in range(start, end + 1):
+                    marks_map[str(q)] = mark_val
+    except Exception as e:
+        print(f"Error extracting marks from question paper: {e}")
+
+    # If stream, seek back to 0 for later use if any
+    if hasattr(source, 'seek'):
+        source.seek(0)
+    
+    return marks_map
+
+def extract_answer_key(source, output_path=None, paper_code=None, paper_source=None):
     """
     source: filepath (str) or file-like object (BytesIO)
     """
     schema = {}
     
+    marks_map = {}
+    if paper_source:
+        print("Extracting marks from question paper...")
+        marks_map = extract_marks_from_paper(paper_source)
+        
     # pdfplumber.open supports both path and file-like objects
     with pdfplumber.open(source) as pdf:
         for page in pdf.pages:
@@ -21,16 +59,25 @@ def extract_answer_key(source, output_path=None, paper_code=None):
                     start_idx = 1
                 
                 for row in table[start_idx:]:
-                    if not row or len(row) < 6:
+                    if not row or len(row) < 4:
                         continue
                     
-                    # Row format: [Q.No, Session, Que.Type, Sec. Name, Key, Marks]
-                    q_no = row[0]
-                    session = row[1]
-                    q_type = row[2]
-                    section = row[3]
-                    key = row[4]
-                    marks = row[5]
+                    if len(row) >= 6:
+                        # Old Row format: [Q.No, Session, Que.Type, Sec. Name, Key, Marks]
+                        q_no = row[0]
+                        session = row[1]
+                        q_type = row[2]
+                        section = row[3]
+                        key = row[4]
+                        marks = row[5]
+                    else:
+                        # New 2026 Row format: ['Q. No.', 'Q. Type', 'Section', 'Key/Range']
+                        q_no = row[0]
+                        q_type = row[1]
+                        section = row[2]
+                        key = row[3]
+                        # Fetch mark from question paper extract
+                        marks = marks_map.get(str(q_no), 1.0) # default to 1.0 if not found
 
                     # Standardize Section Name for Regex Matching (GA, CS, DA, etc.)
                     raw_section = section.strip()
