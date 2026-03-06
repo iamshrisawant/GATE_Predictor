@@ -37,5 +37,10 @@ A Flask-based application to predict GATE scores by analyzing response sheets an
     - `services/`: Business logic (scoring, extraction, email).
     - `routes.py`: API endpoints.
 - `data/`: Stores uploaded answer keys and staging data.
-- `legacy_and_tools/`: Archived legacy scripts and debugging tools.
 - `run.py`: Entry point.
+
+## Preventing Free-Tier Cold Starts
+If you are deploying this application on a free-tier hosting service (like Render) that spins down containers after a period of inactivity, you can use the built-in keep-alive mechanism to prevent lag:
+
+1. **Using Internal Keep-Alive:** Set the `SELF_URL` environment variable to your application's public URL (e.g., `SELF_URL=https://your-app-name.onrender.com`). A background daemon will automatically ping your app every 10 minutes to keep it awake.
+2. **Using UptimeRobot (Alternative):** Alternatively, set up a free monitor on [UptimeRobot](https://uptimerobot.com) to ping `https://your-app-name.onrender.com/api/ping` every 5-10 minutes.

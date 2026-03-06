@@ -7,6 +7,10 @@ main_bp = Blueprint('main', __name__)
 
 ADMIN_PIN = os.getenv("ADMIN_PIN")
 
+@main_bp.route('/api/ping')
+def ping():
+    return jsonify({"status": "alive"}), 200
+
 @main_bp.route('/')
 def index():
     return render_template('index.html')
